@@ -1,9 +1,10 @@
-const express = require('express')
-const app = express();
+import express from 'express';
+
 const port = 3000;
-import { dataSchema } from './mongo';
+import { dataSchema } from './db';
 import { createTodo } from './types';
 import { updateTodo } from './types';
+const app = express();
 app.use(express.json())
 
 app.post('/todo', async (req,res)=>{

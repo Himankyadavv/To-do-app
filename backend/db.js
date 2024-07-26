@@ -9,6 +9,4 @@ const dataSchema = mongoose.model("todolist",{
     completed: boolean
 })
 
-module.exports = {
-    dataSchema: dataSchema
-}
+module.exports (dataSchema);
