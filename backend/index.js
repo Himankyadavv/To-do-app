@@ -1,62 +1,66 @@
-import express from 'express';
+const express = require("express");
+const { createTodo, updateTodo } = require("./types");
+const { database } = require("./db");
 
-const port = 3000;
-import { dataSchema } from './db';
-import { createTodo } from './types';
-import { updateTodo } from './types';
 const app = express();
-app.use(express.json())
 
-app.post('/todo', async (req,res)=>{
-    const input = req.body;
-    const parseinput = createTodo.safeParse(input);
-    if(!parseinput.success){
+app.use(express.json());
+
+
+app.post("/todo", async function(req, res) {
+    const createPayload = req.body;
+    const parsedPayload = createTodo.safeParse(createPayload);
+
+    if (!parsedPayload.success) {
         res.status(411).json({
-            msg: "wrong input !"
+            msg: "You sent the wrong inputs",
         })
-        return ;
+        return;
     }
-
-    await dataSchema.create({
-        title: input.title,
-        description: input.description,
+    // put it in mongodb
+    await database.create({
+        title: createPayload.title,
+        description: createPayload.description,
         completed: false
     })
 
     res.json({
-        msg: "To do created"
+        msg: "Todo created"
     })
 })
 
-app.get('todos',async (req,res)=>{
-    const todos = await dataSchema.find({})
+app.get("/todos", async function(req, res) {
+    const todos = await database.find({});
     res.json({
         todos
     })
+    // res.json({
+    //     todos: []
+    // })
+
 })
 
-app.put('completed',async (req,res)=>{
-    const udpateInput = req.body;
-    const parseUpdateInput = updateTodo.safeParse(udpateInput);
-    if(!parseUpdateInput.success){
-        req.status(411).json({
-            msg: "you send the wrong input "
+app.put("/completed", async function(req, res) {
+    const updatePayload = req.body;
+    const parsedPayload = updateTodo.safeParse(updatePayload);
+    if (!parsedPayload.success) {
+        res.status(411).json({
+            msg: "You sent the wrong inputs",
         })
         return;
     }
 
-    await dataSchema.udpate({
+    await database.update({
         _id: req.body.id
     }, {
-        completed: true
+      completed: true  
     })
 
     res.json({
-        msg: "to do marked as completed"
+        msg: "Todo marked as completed"
     })
-
 })
 
-app.listen(port, ()=>{
-    console.log("server is listening on the port {port}")
-})
+app.listen(3000,function(){
+    console.log("server is listening on port 3000")
+});
